@@ -1,10 +1,15 @@
 from flask import Flask, request,jsonify
 from pymongo import MongoClient
 from dotenv import load_dotenv
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
+
 from datetime import datetime
 import os
 load_dotenv()
 app = Flask(__name__)
+limiter = Limiter(get_remote_address, app=app)
 mongo_url = os.getenv('MONGODB_URL')
 client = MongoClient(mongo_url, 27017)
 def User_exists(id):
@@ -44,6 +49,7 @@ def set_cache(key, value):
 def delete_cache(key):
     cache.delete_one({"key",key})
 @app.route('/users', methods=['POST', 'GET'])
+@limiter.limit("10 per minute")
 def users():
     if request.method=='GET':
         All_users=list(User.find())
@@ -60,7 +66,7 @@ def users():
         if  User.find_one({"id":id}):
             return jsonify({"error": "User already exists"}), 404
         User.insert_one({"name":name,"id":id,"email":email,"password":password})
-        return jsonify("ok"), 202
+        return  "user created", 202
 
 @app.route('/users/<id>', methods=['GET','PUT','DELETE'])
 def user(id):
