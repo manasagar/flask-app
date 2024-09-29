@@ -48,6 +48,9 @@ def set_cache(key, value):
     )
 def delete_cache(key):
     cache.delete_one({"key",key})
+@app.route('/', methods=[ 'GET'])
+def hello():
+    return "hello"
 @app.route('/users', methods=['POST', 'GET'])
 @limiter.limit("10 per minute")
 def users():
@@ -88,3 +91,5 @@ def user(id):
         user=User.delete_one({"id":id})
         delete_cache(id)
         return jsonify(user.acknowledged)
+    if __name__=='__main__':
+        app.run(host='0.0.0.0',port=5000)
