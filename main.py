@@ -4,14 +4,13 @@ from dotenv import load_dotenv
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
-
 from datetime import datetime
 import os
 load_dotenv()
 app = Flask(__name__)
-limiter = Limiter(get_remote_address, app=app)
 mongo_url = os.getenv('MONGODB_URL')
-client = MongoClient(mongo_url, 27017)
+client = MongoClient(mongo_url)
+limiter = Limiter(get_remote_address, app=app)
 def User_exists(id):
     cached_data = get_cache(id)
     if cached_data:
@@ -91,5 +90,5 @@ def user(id):
         user=User.delete_one({"id":id})
         delete_cache(id)
         return jsonify(user.acknowledged)
-    if __name__=='__main__':
-        app.run(host='0.0.0.0',port=5000)
+if __name__=='__main__':
+    app.run(host='0.0.0.0',port=int(3000),debug=True)
