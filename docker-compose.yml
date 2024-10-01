@@ -2,13 +2,14 @@ services:
   flask-app:
     build: .
     ports:
-      - "5000:5000"
+      - "3000:3000"
     environment:
-      - MONGODB_URL=mongodb://mongo:27017/flask_db
-    depends_on:
-      - mongo
+      - MONGODB_URL=mongodb://man:27017
 
-  mongo:
-    image: mongo
+    depends_on:
+      - man
+
+  man:
+    image : mongo:5.0
     ports:
       - "27017:27017"
